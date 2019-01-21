@@ -45,7 +45,7 @@ def append_cell_contents(notebook):
   return notebook
 
 
-def convert_notebook_to_pdf(notebook, output_file=None, template_file=None):
+def convert_notebook_to_pdf(notebook, template_file=None):
   config = get_config()
   exporter = nbconvert.PDFExporter(config)
   if template_file is not None:
@@ -53,10 +53,14 @@ def convert_notebook_to_pdf(notebook, output_file=None, template_file=None):
 
   notebook = nbformat.notebooknode.from_dict(notebook)
   notebook = append_cell_contents(notebook)
-  title = os.path.splitext(os.path.basename(output_file))[0]
   resources = nbconvert.exporters.exporter.ResourcesDict()
-  resources['metadata'] = {'name': title}
+  resources['metadata'] = notebook['metadata']
   (body, resources) = exporter.from_notebook_node(notebook, resources)
 
+  return body
+
+
+def _convert_notebook_to_pdf(notebook, output_file=None, template_file=None):
+  body = convert_notebook_to_pdf(notebook, template_file)
   with open(output_file, 'wb') as fout:
     fout.write(body)

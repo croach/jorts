@@ -1,4 +1,7 @@
+import io
 import os
+
+import nbformat
 
 from .converter import convert_notebook_to_pdf
 
@@ -29,12 +32,24 @@ def bundle(handler, model):
         Notebook model from the configured ContentManager
     """
 
-    notebook = model['content']
-    path = os.path.abspath(model['path'])
-    root_dir = os.path.dirname(path)
-    base, ext = os.path.splitext(os.path.basename(path))
-    output_filename = "{}.pdf".format(base)
+    notebook_filename = model['name']
+    notebook_content = nbformat.writes(model['content']).encode('utf-8')
+    notebook_content = model['content']
+    import pdb; pdb.set_trace()
 
-    convert_notebook_to_pdf(notebook, output_filename)
+    notebook_name = os.path.splitext(notebook_filename)[0]
+    # If the notebook doesn't have a name (which will be the report's title),
+    # grabe the file name and use that as the title.
+    if 'name' not in notebook_content['metadata']:
+      notebook_content['metadata']['name'] = notebook_name
+    pdf_filename = '{}.pdf'.format(notebook_name)
 
-    handler.finish('Converted to {}!'.format(output_filename))
+    with io.BytesIO() as pdf_buffer:
+      pdf_body = convert_notebook_to_pdf(notebook_content)
+      pdf_buffer.write(pdf_body)
+
+      handler.set_attachment_header(pdf_filename)
+      handler.set_header('Content-Type', 'application/pdf')
+
+      # Return the buffer value as the response
+      handler.finish(pdf_buffer.getvalue())
