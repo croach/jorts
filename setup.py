@@ -6,5 +6,10 @@ setup(
   author='Christopher Roach',
   author_email='christopher.g.roach@gmail.com',
   url='http://pypi.python.org/pypi/jorts/',
-  packages=['jorts']
+  packages=['jorts'],
+  entry_points={
+    'console_scripts': [
+      'nb2pdf=jorts.cli:main'
+    ]
+  }
 )
