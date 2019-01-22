@@ -48,6 +48,9 @@ def append_cell_contents(notebook):
 def convert_notebook_to_pdf(model, template_file=None):
   config = get_config()
   exporter = nbconvert.PDFExporter(config)
+  # Hide input and output prompts (e.g., In [32]: ) from the exported content
+  exporter.exclude_input_prompt = True
+  exporter.exclude_output_prompt = True
   if template_file is not None:
     exporter.template_file = template_file
 
