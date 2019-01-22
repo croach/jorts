@@ -33,19 +33,11 @@ def bundle(handler, model):
     """
 
     notebook_filename = model['name']
-    notebook_content = nbformat.writes(model['content']).encode('utf-8')
-    notebook_content = model['content']
-    import pdb; pdb.set_trace()
-
     notebook_name = os.path.splitext(notebook_filename)[0]
-    # If the notebook doesn't have a name (which will be the report's title),
-    # grabe the file name and use that as the title.
-    if 'name' not in notebook_content['metadata']:
-      notebook_content['metadata']['name'] = notebook_name
     pdf_filename = '{}.pdf'.format(notebook_name)
 
     with io.BytesIO() as pdf_buffer:
-      pdf_body = convert_notebook_to_pdf(notebook_content)
+      pdf_body = convert_notebook_to_pdf(model)
       pdf_buffer.write(pdf_body)
 
       handler.set_attachment_header(pdf_filename)

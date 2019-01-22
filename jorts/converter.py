@@ -45,16 +45,20 @@ def append_cell_contents(notebook):
   return notebook
 
 
-def convert_notebook_to_pdf(notebook, template_file=None):
+def convert_notebook_to_pdf(model, template_file=None):
   config = get_config()
   exporter = nbconvert.PDFExporter(config)
   if template_file is not None:
     exporter.template_file = template_file
 
-  notebook = nbformat.notebooknode.from_dict(notebook)
+  notebook = nbformat.notebooknode.from_dict(model['content'])
   notebook = append_cell_contents(notebook)
+  notebook_name = os.path.splitext(model.get('name', 'Notebook'))[0]
+  # For some reason the from_notebook_node function does not bother to use the
+  # notebook's metadata, so we need to extract it from the notebook, add it to
+  # the resources dict, and pass it in directly.
   resources = nbconvert.exporters.exporter.ResourcesDict()
-  resources['metadata'] = notebook['metadata']
+  resources['metadata'] = dict({'name': notebook_name}, **notebook['metadata'])
   (body, resources) = exporter.from_notebook_node(notebook, resources)
 
   return body
