@@ -1,0 +1,55 @@
+((*- extends 'article.tplx' -*))
+
+((* block docclass *))
+\documentclass[9pt]{article}
+
+% TODO: Where should this type of config actually go?
+% Remove paragraph indentation
+\setlength\parindent{0em}
+\setlength\parskip{1em}
+
+% Remove all section numbers
+\setcounter{secnumdepth}{0}
+((* endblock docclass *))
+
+((* block packages *))
+((( super() )))
+
+% Let all figures float 'H'ere
+\usepackage{float}
+\floatplacement{figure}{H}
+
+% Nice tables
+\usepackage{array}
+((* endblock packages *))
+
+% The following is taken from the latest version of base.tplx. I've added it
+% here because this is not in the version nbconvert that is currently available
+% via conda install.
+((* block author *))
+  ((* if 'authors' in nb.metadata *))
+  \author{((( nb.metadata.authors | join(', ', attribute='name') )))}
+  ((* endif *))
+((* endblock author *))
+
+%===============================================================================
+% Input
+%===============================================================================
+
+((* block input scoped *))
+((( cell.source | highlight_code(strip_verbatim=False, metadata=cell.metadata) )))
+((* endblock input *))
+
+%===============================================================================
+% Output
+%===============================================================================
+
+((* block execute_result scoped *))
+  ((*- for type in output.data | filter_data_type -*))
+    ((*- if type in ['text/plain'] *))
+((( output.data['text/plain'] | escape_latex )))
+    ((* else -*))
+((( super() )))
+    ((*- endif -*))
+  ((*- endfor -*))
+((* endblock execute_result *))

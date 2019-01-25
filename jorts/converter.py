@@ -15,7 +15,10 @@ except ImportError:
 # are 1,2,3,4 and the default is 4.
 NBFORMAT_VERSION = 4
 
-def convert_notebook_to_pdf(model, template_file=None):
+# The default LaTeX template to be used when converting the notebook to PDF
+DEFAULT_TEMPLATE = 'report.tplx'
+
+def convert_notebook_to_pdf(model, template_file='report.tplx'):
   config = _get_config(default={
     'TagRemovePreprocessor': {
       'remove_all_outputs_tags': {"hide_output"},
@@ -23,18 +26,19 @@ def convert_notebook_to_pdf(model, template_file=None):
       'remove_cell_tags': {"hide_all"}
     }
   })
-  # I believe i may be able to use this to add my own template to the those
-  # available. That way I can use it, and users can extend it.
-  #config['Exporter']['template_path'].append('my_template_path)
+
+  # Get the location of the report template and add that path to the exporter's
+  # template_path list
+  root_dir = os.path.dirname(os.path.abspath(__file__))
+  templates_dir = os.path.join(root_dir, 'templates')
+  config['Exporter']['template_path'].append(templates_dir)
   exporter = nbconvert.PDFExporter(config)
+  exporter.template_file = template_file if template_file is not None else DEFAULT_TEMPLATE
   # Hide input and output prompts (e.g., In [32]: ) from the exported content
   # For some reason, setting exclude_input_prompt = True is causing the
   # newlines in the code to dissapear. This appears to be a bug in nbconvert.
   # exporter.exclude_input_prompt = True
   # exporter.exclude_output_prompt = True
-
-  if template_file is not None:
-    exporter.template_file = template_file
 
   notebook = nbformat.notebooknode.from_dict(model['content'])
   notebook = _append_cell_contents(notebook)

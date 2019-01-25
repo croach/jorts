@@ -11,5 +11,6 @@ setup(
     'console_scripts': [
       'nb2pdf=jorts.cli:main'
     ]
-  }
+  },
+  include_package_data=True
 )
