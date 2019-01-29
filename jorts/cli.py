@@ -76,7 +76,13 @@ def main():
     'type': 'notebook',
     'name': args.notebook
   }
-  output_file = os.path.splitext(args.notebook)[0] + '.pdf'
   body = convert_notebook_to_pdf(model, args.template_file)
-  with open(args.output_file, 'wb') as fout:
+
+  # Get the output file name, or use the notebook's title if none was passed in
+  if args.output_file is not None:
+    output_file = args.output_file
+  else:
+    output_file = os.path.splitext(args.notebook)[0] + '.pdf'
+
+  with open(output_file, 'wb') as fout:
     fout.write(body)
