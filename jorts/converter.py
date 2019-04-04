@@ -1,3 +1,4 @@
+import logging
 import os
 import collections
 
@@ -18,7 +19,7 @@ NBFORMAT_VERSION = 4
 # The default LaTeX template to be used when converting the notebook to PDF
 DEFAULT_TEMPLATE = 'report.tplx'
 
-def convert_notebook_to_pdf(model, template_file='report.tplx'):
+def convert_notebook_to_pdf(model, template_file='report.tplx', log_level=None):
   config = _get_config(default={
     'TagRemovePreprocessor': {
       'remove_all_outputs_tags': {"hide_output"},
@@ -39,6 +40,12 @@ def convert_notebook_to_pdf(model, template_file='report.tplx'):
   # newlines in the code to dissapear. This appears to be a bug in nbconvert.
   # exporter.exclude_input_prompt = True
   # exporter.exclude_output_prompt = True
+  if log_level is not None:
+    exporter.log.setLevel(log_level)
+    exporter.propagate = False
+    handler = logging.StreamHandler()
+    handler.setLevel(log_level)
+    exporter.log.addHandler(handler)
 
   notebook = nbformat.notebooknode.from_dict(model['content'])
   notebook = _append_cell_contents(notebook)

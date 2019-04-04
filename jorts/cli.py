@@ -48,6 +48,7 @@ label, whereas a cell can have several tags.
 import nbformat
 
 import argparse
+import logging
 import os
 
 from jorts.converter import convert_notebook_to_pdf
@@ -56,6 +57,42 @@ from jorts.converter import convert_notebook_to_pdf
 # The nbformat version to write. Use this to downgrade notebooks. The choices
 # are 1,2,3,4 and the default is 4.
 NBFORMAT_VERSION = 4
+
+# def get_log_level(level):
+#   """Returns the logging level for a given string representation
+
+#   This function will take a string representation of a log level and return the
+#   corresponding logging level. The string representation can be either the
+#   integer value or the name of the logging level.
+
+#   """
+#   try:
+#     return int(level.strip())
+#   except:
+#     getattr(logging, level.strip().upper(), logging.NOTSET)
+
+class LogLevelAction(argparse.Action):
+    def __init__(self, option_strings, dest, nargs=None, **kwargs):
+        if nargs is not None:
+            raise ValueError("nargs not allowed")
+        super(LogLevelAction, self).__init__(option_strings, dest, **kwargs)
+
+    def __call__(self, parser, namespace, values, option_string=None):
+        setattr(namespace, self.dest, self.get_log_level(values))
+
+    def get_log_level(self, level):
+      """Returns the logging level for a given string representation
+
+      This function will take a string representation of a log level and return the
+      corresponding logging level. The string representation can be either the
+      integer value or the name of the logging level.
+
+      """
+      try:
+        return int(level.strip())
+      except:
+        return getattr(logging, level.strip().upper(), logging.NOTSET)
+
 
 def main():
   parser = argparse.ArgumentParser(
@@ -67,6 +104,11 @@ def main():
                       help='Optional template file')
   parser.add_argument('--output', dest='output_file', type=str,
                       help='Name of the output file')
+  parser.add_argument('--log-level', dest='log_level', action=LogLevelAction,
+                      choices=('0', '10', '20', '30', '40', '50',
+                               'DEBUG', 'INFO', 'WARNING', 'ERROR', 'CRITICAL', 'FATAL',
+                               'debug', 'info', 'warning', 'error', 'critical', 'fatal'),
+                      help='Set the log level by value or name')
   args = parser.parse_args()
 
   # Pull the code from the notebook, add it to the appendix, and convert the
@@ -76,7 +118,7 @@ def main():
     'type': 'notebook',
     'name': args.notebook
   }
-  body = convert_notebook_to_pdf(model, args.template_file)
+  body = convert_notebook_to_pdf(model, args.template_file, args.log_level)
 
   # Get the output file name, or use the notebook's title if none was passed in
   if args.output_file is not None:
