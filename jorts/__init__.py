@@ -6,7 +6,8 @@ import nbformat
 from .converter import convert_notebook_to_pdf
 
 def _jupyter_bundlerextension_paths():
-    """Example "hello world" bundler extension"""
+    """Bundler extension for creating beautiful (or, at least tolerable) reports
+    """
     return [{
         'name': 'jorts_bundler',
         'label': 'Human Readable Report (.pdf)',

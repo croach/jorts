@@ -80,6 +80,8 @@ def _update_config(a, b):
   overwrite the original value. This allows the function to preserve the
   original configuration settings while adding those from the second dict.
 
+  TODO: Can I remove this function and replace it with a call to config.merge?
+
   """
   for k, v in b.items():
     if k in a:
