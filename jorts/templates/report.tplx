@@ -3,17 +3,16 @@
 ((* block docclass *))
 \documentclass[9pt]{article}
 
-% TODO: Where should this type of config actually go?
 % Remove paragraph indentation
 \setlength\parindent{0em}
 \setlength\parskip{1em}
 
 % Remove all section numbers
 \setcounter{secnumdepth}{0}
-((* endblock docclass *))
 
-((* block packages *))
-((( super() )))
+% Remove full justification
+\usepackage[document]{ragged2e}
+%\usepackage{ragged2e}
 
 % Let all figures float 'H'ere
 \usepackage{float}
@@ -21,6 +20,12 @@
 
 % Nice tables
 \usepackage{array}
+
+((* endblock docclass *))
+
+((* block packages *))
+((( super() )))
+
 ((* endblock packages *))
 
 % The following is taken from the latest version of base.tplx. I've added it
